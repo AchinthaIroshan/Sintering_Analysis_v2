@@ -1,26 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jul 30 12:14:13 2019
+Created on Tue Jul 30 13:01:56 2019
 
 @author: aik19
-
 """
-from pathlib import Path
 
+from pathlib import Path
+import pandas as pd
 import numpy as np
 from sklearn import svm, metrics, datasets
 from sklearn.utils import Bunch
 from sklearn.model_selection import GridSearchCV, train_test_split
-
 from skimage.io import imread
 from skimage.transform import resize
-
 #import pickle
-from joblib import dump
-from pathlib import Path
-from joblib import load
+from joblib import dump,load
 import matplotlib.pyplot as plt
+import nrrd
+import os
 
 
 def load_image_files(container_path, dimension=(64, 64)):
@@ -81,8 +79,57 @@ def trainSVM():
         clf, metrics.classification_report(y_test, y_pred)))
     dump(clf, 'classifier_svm.joblib')
 
-def strutslicer(imagepath):
+def strutslicer(image_read_path,image_write_path):
+    data,header = nrrd.read(Path(image_read_path))
+    image = data.T
+    features = []
+    clf = load('classifier_svm.joblib') 
+    for slices in image:
+         img_resized = resize(slices, (64,64), anti_aliasing=True, mode='reflect')   
+         features.append(img_resized.flatten())
+    labels = clf.predict(features)
+    print(labels)   
     
+    
+    z,y,x = image.shape
+    
+    black = np.zeros((y,x))
+    #plt.imshow(black)
+    #plt.imshow(image[0])
+    
+    for i in range(z):
+        if labels[i] == 1:
+            image[i] = black
+    
+    saveIm = image.T
+    
+    nrrd.write(image_write_path,saveIm )
 
 
+def strutslice_selector(image_read_path):
+    data,header = nrrd.read(Path(image_read_path))
+    image = data.T
+    features = []
+    clf = load('classifier_svm.joblib') 
+    for slices in image:
+         img_resized = resize(slices, (64,64), anti_aliasing=True, mode='reflect')   
+         features.append(img_resized.flatten())
+    labels = clf.predict(features)
+    print(labels)
+    return labels
     
+    
+def run_strut_slicer():
+    
+    trainSVM()
+    folder_in = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/Resampled/"
+    slicelabels={}
+    for filename in os.listdir(folder_in):
+        imagepath = os.path.join(folder_in, filename)
+        labels = strutslice_selector(imagepath)
+        slicelabels.update({filename : labels})
+    df = pd.DataFrame(data=slicelabels)
+    df.to_csv("sliceLabels.csv", index=False)
+
+run_strut_slicer()
+        

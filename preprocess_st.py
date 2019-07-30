@@ -4,6 +4,7 @@ import os
 from script.imglib import ImgLib
 from script.imglib.algorithm import Resample
 from ij.io import FileSaver 
+import csv
 
 folder1 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/Raw_8bits/"
 folder2 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/contrastad_and_cropped/" 
@@ -73,12 +74,34 @@ def covertTo8bits(folder_in,folder_out):
 		output = "nrrd=["+folder_out+filename+"]"
 		IJ.run(imp, "Nrrd ... ", output)
 
+def getLabels():
+	with open('/home/aik19/Achintha/Sintering analysis/Scripts/Sintering_Analysis_The_New_Approach/Labels.csv','r') as csv_file:
+		csv_reader = csv.reader(csv_file, delimiter=',')
+		line_count=0
+		rows = []
+		for row in csv_reader:
+			if line_count==0:
+				file_names = row
+				line_count +=1
+			else:
+				rows.append(row)
+				line_count +=1
+		return file_names,rows
+
+
+
+
+file_names,rows = getLabels()
+
+print(len(rows))
+
+
 
 
 #prepros1(folder_in,folder_out,firstFolder)	
 #prepros2(folder2,folder3)
 #rescale(folder3,folder4)
-stackToSlices(folder4,folder5,firstFolder)
+#stackToSlices(folder4,folder5,firstFolder)
 		
 		#IJ.run(imp, "TransformJ Rotate", "z-angle=9 y-angle=-6 x-angle=0.0 interpolation=Linear background=0.0");
 		#stack = imp.getImageStack()
