@@ -66,6 +66,15 @@ def stackToSlices(folder_in,folder_out,folder_num):
 			filepath = os.path.join(output,str(i))
 			fs.saveAsTiff(filepath)		
 
+def covertTo8bits(folder_in,folder_out):
+	for filename in os.listdir(folder_in):  
+		imp = IJ.openImage(os.path.join(folder_in, filename))
+		IJ.run(imp, "8-bit", "") 
+		output = "nrrd=["+folder_out+filename+"]"
+		IJ.run(imp, "Nrrd ... ", output)
+
+
+
 #prepros1(folder_in,folder_out,firstFolder)	
 #prepros2(folder2,folder3)
 #rescale(folder3,folder4)

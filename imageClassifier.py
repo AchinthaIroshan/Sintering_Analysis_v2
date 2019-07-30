@@ -12,7 +12,7 @@ from skimage.transform import resize
 from joblib import load
 import matplotlib.pyplot as plt
 
-data,header = nrrd.read(Path("/home/aik19/Achintha/Sintering analysis/Macro Scale ICIE16/Preprocessed.nrrd"))
+data,header = nrrd.read(Path("/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/Resampled/74125.nrrd"))
 image = data.T
 features = []
 clf = load('classifier_svm.joblib') 
@@ -33,7 +33,9 @@ for i in range(z):
     if labels[i] == 1:
         image[i] = black
 
-nrrd.write('output1.nrrd', image.T)      
+saveIm = image.T
+
+nrrd.write('/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/strutSlicer/74125.nrrd',saveIm )      
     
     
 
