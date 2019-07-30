@@ -13,6 +13,8 @@ firstFolder = 74122
 folder3 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/RotatedNCropped/"
 folder4 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/Resampled/"
 folder5 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/Resampled_Slices/"
+folder6 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/strutSlice_8bit/"
+folder7 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/SegmentedStrutSlices/" 
 
 def prepros1(folder_in,folder_out,firstFolder):
 	for x in range(1):
@@ -88,12 +90,23 @@ def getLabels():
 				line_count +=1
 		return file_names,rows
 
+def ProcessSlices(folder_in,folder_out):
+	
+	file_names,rows = getLabels()
+	for i in range(len(file_names)):
+		imp = IJ.openImage(os.path.join(folder_in, file_names[i]))
+		stack = imp.getImageStack()
+		for j in range(imp.getNSlices()):
+			if rows[j][i]== '0':
+				print("process")
+			else:
+				print("skip") 
 
+ProcessSlices(folder6,folder7)
+#file_names,rows = getLabels()
 
-
-file_names,rows = getLabels()
-
-print(len(rows))
+#print(len(rows))
+#print(rows[220][0])
 
 
 
