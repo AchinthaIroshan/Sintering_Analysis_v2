@@ -1,10 +1,13 @@
 from ij.plugin import FolderOpener
-from ij import IJ,ImagePlus
+from ij import IJ,ImagePlus,ImageStack
 import os
 from script.imglib import ImgLib
 from script.imglib.algorithm import Resample
 from ij.io import FileSaver 
 import csv
+from mpicbg.ij.plugin import NormalizeLocalContrast  
+from ij.plugin.filter import ParticleAnalyzer as PA
+from ij.measure import ResultsTable
 
 folder1 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/Raw_8bits/"
 folder2 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/contrastad_and_cropped/" 
@@ -15,6 +18,9 @@ folder4 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/Resa
 folder5 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/Resampled_Slices/"
 folder6 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/strutSlice_8bit/"
 folder7 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/SegmentedStrutSlices/" 
+folder8 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/SegmentedStruts_tifs/"
+folder9 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/rm_smallCC/"
+
 
 def prepros1(folder_in,folder_out,firstFolder):
 	for x in range(1):
@@ -96,14 +102,76 @@ def ProcessSlices(folder_in,folder_out):
 	for i in range(len(file_names)):
 		imp = IJ.openImage(os.path.join(folder_in, file_names[i]))
 		stack = imp.getImageStack()
+		stack2 = ImageStack(imp.width,imp.height)
+		
 		for j in range(imp.getNSlices()):
 			if rows[j][i]== '0':
+				ip = stack.getProcessor(j+1)
+				#NormalizeLocalContrast.run(ip, 341, 326, 4, True, True)
+				#imagep = ImagePlus("imp",ip)
+				#IJ.run(imagep, "Non-local Means Denoising", "sigma=15 smoothing_factor=1 slice")
+				#imagep.setRoi(2,0,336,320);
+				#IJ.run(imagep, "Level Sets", "method=[Active Contours] use_level_sets grey_value_threshold=50 distance_threshold=0.50 advection=2.20 propagation=1 curvature=1 grayscale=30 convergence=0.0025 region=inside")
+				#fimp = IJ.getImage()
+				#fip  = fimp.getProcessor()
+				fimp = removeSmallCCs(imp)
+				fip  = fimp.getProcessor()
+				stack2.addSlice(fip)
 				print("process")
+		
 			else:
-				print("skip") 
+				ip = stack.getProcessor(j+1)
+				stack2.addSlice(ip)
+		
+		final_imp = ImagePlus("image",stack2)
+		output = "nrrd=["+folder_out+file_names[i]+"]"
+		IJ.run(final_imp, "Nrrd ... ", output)
 
-ProcessSlices(folder6,folder7)
+def removeSmallCCs(image):
+
+	MINSIZE = 1000
+	MAXSIZE = 1000000
+
+	options = PA.SHOW_ROI_MASKS 
+			
+	
+	results = ResultsTable()
+	
+	p = PA(options, PA.STACK_POSITION + PA.LABELS + PA.AREA + PA.PERIMETER + PA.CIRCULARITY, results, MINSIZE, MAXSIZE)
+	p.setHideOutputImage(True)
+	p.analyze(image)
+	mmap = p.getOutputImage()
+	mip = mmap.getProcessor() 
+	mip.threshold(0)
+	img = ImagePlus("rods_processed", mip)
+	IJ.run(img, "8-bit", "") 
+	IJ.run(img, "Make Binary", "method=Default background=Dark black")
+	
+
+	return img
+
+
+ProcessSlices(folder7,folder8)
+#imp = IJ.openImage("/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/SegmentedStruts_tifs/74122/221")
+#imp.show()
+#imp1 = analyzeParticles(imp)
+#imp1.show()
+
+
+#stackToSlices(folder7,folder8,firstFolder)
+#imp = IJ.getImage()
+#ip  = imp.getProcessor()
+#NormalizeLocalContrast.run(ip, 341, 326, 4, True, True)  
+#imp2 = ImagePlus("imp",ip)
+#imp2.show()
+
+#IJ.run(imp, "Enhance Contrast", "saturated=0.35")
+#IJ.run(imp, "Apply LUT", "stack")
+#IJ.run(imp, "Non-local Means Denoising", "sigma=15 smoothing_factor=1 stack")
+#ProcessSlices(folder6,folder7)
 #file_names,rows = getLabels()
+
+
 
 #print(len(rows))
 #print(rows[220][0])
