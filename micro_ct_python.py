@@ -14,25 +14,31 @@ from skimage import filters
 import matplotlib.pyplot as plt
 import numpy as np
 
-image,header = nrrd.read(Path("/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/rm_smallCC/74122.nrrd"))
+firstfolder = 74124
+folder = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/rm_smallCC/"
+
+image,header = nrrd.read(Path(folder+str(firstfolder)+".nrrd"))
 
 
 imaget= image.T
 labelledImage = measure.label(imaget, background=0)
-objectmes = measure.regionprops(labelledImage)
-print(objectmes[0].centroid)
-print(objectmes[0].label)
-print(objectmes[1].coords)
+labelledImage1 = measure.label(image,background=0)
 
+
+objectmes = measure.regionprops(labelledImage1)
 print(objectmes[3].centroid)
+#print(objectmes[3].label)
+#print(objectmes[1].coords)
+
+#print(objectmes[3].centroid)
 
 
 
-plt.imshow(labelledImage[2])
+plt.imshow(labelledImage[0])
 plt.figure()
-plt.imshow(objectmes[0].filled_image[0])
-plt.figure()
-plt.imshow(objectmes[0].image[0])
+plt.imshow(labelledImage1.T[0])
+#plt.figure()
+#plt.imshow(objectmes[0].image[0])
 
 
 #all_labels = measure.label(image.T)
