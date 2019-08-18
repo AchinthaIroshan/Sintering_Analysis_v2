@@ -131,5 +131,12 @@ def run_strut_slicer():
     df = pd.DataFrame(data=slicelabels)
     df.to_csv("sliceLabels.csv", index=False)
 
-run_strut_slicer()
+#run_strut_slicer()
+#trainSVM()
+
+image_read_path = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/Resampled/74126.nrrd"
+image_write_path = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/strutSlicer/74126.nrrd"
+strutslicer(image_read_path,image_write_path)
+
+
         
