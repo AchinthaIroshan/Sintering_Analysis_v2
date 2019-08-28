@@ -9,6 +9,8 @@ from mpicbg.ij.plugin import NormalizeLocalContrast
 from ij.plugin.filter import ParticleAnalyzer as PA
 from ij.measure import ResultsTable
 
+
+
 folder1 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/Raw_8bits/"
 folder2 = "/media/aik19/Seagate Backup Plus Drive/ICIE16_Analysis_V2/Stage1/contrastad_and_cropped/" 
 
@@ -123,7 +125,7 @@ def covertTo8bitsBatch(folder_in,folder_out):
 			fs.saveAsTiff(filepath)
 
 
-covertTo8bitsBatch(v2_folder_1,v2_folder_2)
+#covertTo8bitsBatch(v2_folder_1,v2_folder_2)
 
 
 def getLabels():
@@ -233,6 +235,11 @@ def removeSmallCCs(image):
 
 	return img
 
+
+
+def microRoI(input_folder,folder_centers,output_folder):
+		
+	
 
 #preprocess_slices_giv_im(4,file5,file6)
 #ProcessSlices(folder7,folder8)
